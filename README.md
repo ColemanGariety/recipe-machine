@@ -1,4 +1,4 @@
-# The Recipe Machine
+# Recipe Machine
 
 This is a basic "recipe" machine. It receives algorithmic formulas (recipes) and data (ingredients) in the form of JSON and returns computed values in a readable manner.
 

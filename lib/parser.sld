@@ -3,11 +3,11 @@
           (scheme write)
           (chibi regexp)
           (srfi 69)
-          (utils))
+          (lexer))
   (export parse
           value-of)
   (begin
-
+    
     ;; {HashTable}:
     ;;     "[revenue] - [expenses]" -> #<procedure>
     (define (parse-formula recipe)
@@ -16,7 +16,7 @@
       (hash-table-set! recipe
                        'formula
                        (lambda (key)
-                         (formula-parser formula)))
+                         (tokenize "1 + (2 + 3) + 4 + [my var]")))
       recipe)
     
     ;; {HashTable} -> VALIDATED {HashTable}
