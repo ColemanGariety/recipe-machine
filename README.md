@@ -2,14 +2,42 @@
 
 This is a basic "recipe" machine. It receives algorithmic formulas (recipes) and data (ingredients) in the form of JSON and returns computed values in a readable manner.
 
-It's built using [R4RS scheme](https://people.csail.mit.edu/jaffer/r4rs_toc.html) and compiled with [Stalin](https://github.com/barak/stalin). Stalin gives us a near-C-performant executable called `recipe-machine`.
+It's built using [R7RS-small Scheme](http://trac.sacrideo.us/wg/wiki/R7RSHomePage) and compiled with [Chibi Scheme](http://synthcode.com/wiki/chibi-scheme).
 
-## Build
+## Install
 
-1. `$ git clone whatever`
-2. `$ make`
+Once you've cloned this gist, all you have to do is install a Scheme implementation. I like chibi:
 
-## Usage
+1. `$ brew install chibi-scheme`
 
-1. `$ ./recipe-machine my-data.json`
-2. profit?
+or
+
+1. `$ git clone https://github.com/ashinn/chibi-scheme.git`
+2. `$ cd chibi-scheme`
+3. `$ make`
+
+It works with anything R7RS-compliant, though (chibi, chicken, foment, kawa, larceny, and sagittarius).
+
+## API
+
+The machine works like this:
+
+1. Load the library
+
+    (import (parser))
+
+2. Instantiate the class:
+
+    (define net-profit (parse my-hash-table-of-data))
+
+3. Compute a value:
+
+    (value-of net-profit '2015-02-28) ;; => 4907.89
+    (value-of (parse recipe) '2016-12-31) ;; => nil
+
+## Example
+
+Just run `example.scm`:
+
+1. `$ path/to/chibi-scheme main.scm`
+2. profit
