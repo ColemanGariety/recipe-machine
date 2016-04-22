@@ -16,7 +16,7 @@
       (hash-table-set! recipe
                        'formula
                        (lambda (key)
-                         (tokenize "1 + (2 + 3) + 4 + [my var]")))
+                         (tokenize "(12) + 3 + (2 + 3) + [my variable]")))
       recipe)
     
     ;; {HashTable} -> VALIDATED {HashTable}
