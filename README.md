@@ -8,7 +8,7 @@ It's written in [R7RS-small Scheme](http://trac.sacrideo.us/wg/wiki/R7RSHomePage
 
 ## Install
 
-Once you've cloned this gist, all you have to do is install an R7RS-compliant Scheme (I like chibi, but it'll work with any R7RS Scheme) and the macduffie json dependency:
+Once you've cloned this repo, all you have to do is install an R7RS-compliant Scheme (I like chibi, but it'll work with any R7RS Scheme) and the macduffie json dependency:
 
 ##### via Homebrew
 
