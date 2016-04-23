@@ -54,12 +54,13 @@ The machine works like this:
 You can also use the lexer or the "shunting-yard" parser by themselves:
 
 ```scheme
-(import (lexer))
+(import (lexer)
+        (infix))
 
-;; lex takes a string
-(lex "1 + 2")  ;; (1 + 2)
+;; lex takes an infix string and returns an infix expression
+(lex "1 + 2")  ;; '(1 + 2)
 
-;; infix->sexp takes an infix-expression
+;; infix->sexp takes an infix expression and returns an s-expression
 (infix->sexp '(1 + 2)) ;; (+ 1 2)
 ```
 ## Test
