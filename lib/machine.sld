@@ -2,47 +2,78 @@
   (import (scheme base)
           (scheme write)
           (scheme eval)
+          (srfi 1)
           (srfi 69)
           (lexer)
           (infix))
   (export make-recipe
           value-for
-          generate-scope)
+          get-variables)
   (begin
     
     ;; {HashTable} -> {HashTable}
     ;; Validates the table and parses the formula
     (define (make-recipe recipe)
+      ;; first, we validate the input
       (if (and (hash-table-exists? recipe 'type)
                (hash-table-exists? recipe 'name)
                (hash-table-exists? recipe 'formula)
                (hash-table-exists? recipe 'ingredients))
-          (begin (hash-table-set! recipe 'expression (parse (hash-table-ref recipe 'formula)))
-                 recipe) ;; return the recipe
+
+          ;; now lets parse the formula into an expression
+          (begin (hash-table-set! recipe 'expression (infix->sexp (lex (hash-table-ref recipe 'formula))))
+
+                 ;; next, let's recursively go through
+                 ;; the ingredients and parse the
+                 ;; formulas so we don't have to do it
+                 ;; later...
+                 (map (lambda (table)
+                        (if (string=? (hash-table-ref table 'type) "recipe")
+                            (make-recipe table)
+                            table))
+                      (hash-table-ref recipe 'ingredients))
+
+                 ;; return the recipe
+                 recipe)
+
+          ;; invalid data error
           (error "Malformed input: recipe")))
 
-    (define (parse formula)
-      (infix->sexp (lex formula)))
-
     ;; {HashTable}, key -> <List>
-    (define (generate-scope ingredients key)
-      (map (lambda (table)
-             (define type (hash-table-ref table 'type))
-             (cond ((equal? type "ingredient") (let ((reported-data (hash-table-ref table 'reported_data))
-                                                      (name (hash-table-ref table 'name)))
-                                                 (if (hash-table-exists? reported-data key)
-                                                     (list (string->symbol name) (hash-table-ref reported-data key))
-                                                     #f)))
-                   
-                   ((equal? type "recipe") (let ((name (hash-table-ref table 'name)))
-                                             (list (string->symbol name) (value-for (make-recipe table) key))))))
-      ingredients))
+    (define (get-variables ingredients key)
+      (map (lambda (store)
+             (define type (hash-table-ref store 'type))
+             (define name (hash-table-ref store 'name))
+
+             ;; ingredients get "data-for"
+             ;; and recipes get "value-for"
+             (cond ((string=? type "ingredient") (list (string->symbol name) (data-for store key)))
+                   ((string=? type "recipe") (list (string->symbol name) (value-for store key)))))
+           ingredients))
+
+    ;; 'key -> *
+    ;; This is like value-for, but for
+    ;; ingredients rather than recipes
+    (define (data-for ingredient key)
+      (define reported-data (hash-table-ref ingredient 'reported_data))
+      (if (hash-table-exists? reported-data key)
+          (hash-table-ref reported-data key)
+          '()))
     
     ;; {HashTable}, 'key -> {HashTable #(key)}
     (define (value-for recipe key)
       (define ingredients (hash-table-ref recipe 'ingredients))
-      (define scope (generate-scope ingredients key))
-      (if (car scope)
-          (let ((formula (append (list 'let scope) (list (hash-table-ref recipe 'expression)))))
-            (eval formula (environment '(scheme base))))
-          "nil"))))
+      (define variables (get-variables ingredients key))
+
+      ;; lets see if any of the data we
+      ;; need is missing
+      (if (any null? (map cadr variables))
+          '()
+
+          ;; This jargon here is actually
+          ;; wrapping our formula expression
+          ;; in its own private scope and
+          ;; populating it with the available
+          ;; data.
+          (let ((formula (append (list 'let variables) (list (hash-table-ref recipe 'expression)))))
+            (eval formula (environment '(scheme base))))))))

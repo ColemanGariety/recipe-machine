@@ -10,6 +10,7 @@
           (srfi 1)) ;; circular lists & more!
   (export infix->sexp)
   (begin
+
     (define ops '(+ - * /))
 
     ;; Order Of Operations

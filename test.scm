@@ -13,7 +13,7 @@
 
 (test-group "machine"
             (test-assert "make-recipe returns a hash-table" (hash-table? (make-recipe nested-recipes)))
-            (test "value-for can handle invalid value with nested-recipe" "nil" (value-for (make-recipe nested-recipes) '|0000-00-00|))
+            (test "value-for can handle invalid value with nested-recipe" '() (value-for (make-recipe nested-recipes) '|0000-00-00|))
             (test "value-for can handle valid value with nested recipe" 14147.34 (value-for (make-recipe nested-recipes) '|2015-02-28|)))
 
 (test-group "lex"
@@ -23,8 +23,7 @@
             (test "lex can handle division" '(1 / 2) (lex "1 / 2"))
             (test "lex can handle expressions without spaces" '(1 + 2) (lex "1+2"))
             (test "lex can handle variables" '(|foo|) (lex "[foo]"))
-            (test "lex can handle multi-digit numbers" '(123 + 456) (lex "123 + 456"))
-            (test "push filters out empty strings" '() (push '() "")))
+            (test "lex can handle multi-digit numbers" '(123 + 456) (lex "123 + 456")))
 
 (test-group "infix"
             (test "infix can handle addition" '(+ 1 2) (infix->sexp '(1 + 2)))
